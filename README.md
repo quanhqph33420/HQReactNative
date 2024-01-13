@@ -1,6 +1,6 @@
 # quanhqph33420ReactNative
 
-- Install library
+- # Install library
 - npm install
 - npm install @react-navigation/native
 - npm install @react-navigation/native-stack
