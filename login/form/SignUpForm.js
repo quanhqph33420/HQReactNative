@@ -16,10 +16,15 @@ import { Text, StyleSheet, TouchableOpacity } from "react-native";
 import color from "../../src/color";
 
 export default function SignUpForm({ navigation }) {
-  const [text, setText] = useState({ username: "", password: "" });
+  const [text, setText] = useState({
+    username: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
   const InputForm = () => {
     const [showPass, setShowPass] = React.useState(false);
-     const [showConPass, setShowConPass] = React.useState(false);
+    const [showConPass, setShowConPass] = React.useState(false);
     return (
       <Stack space={4} w="100%" alignItems="center">
         <Input
@@ -96,13 +101,12 @@ export default function SignUpForm({ navigation }) {
         >
           Sign In
         </Button>
-      
       </Box>
     );
   };
   return (
     <NativeBaseProvider>
-      <Center flex={1} style={styles.margin}>
+      <Center style={styles.margin}>
         <InputForm />
       </Center>
       <TouchableOpacity>

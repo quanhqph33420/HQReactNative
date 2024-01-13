@@ -11,13 +11,12 @@ import {
   Button,
 } from "native-base";
 import { MaterialIcons } from "@expo/vector-icons";
-import { useState } from "react";
 import { Text, StyleSheet, TouchableOpacity } from "react-native";
 import color from "../../src/color";
+import User from "../../model/userModel";
 
-export default function SignInForm({navigation}) {
-
-  const [text, setText] = useState({ username: "", password: "" });
+export default function SignInForm({ navigation }) {
+  const user = new User.user();
   const InputForm = () => {
     const [show, setShow] = React.useState(false);
     return (
@@ -29,6 +28,9 @@ export default function SignInForm({navigation}) {
             <Icon as={<MaterialIcons name="person" />} size={7} ml="2" />
           }
           placeholder="Username"
+          onChangeText={(newText) => {
+            user.username = newText;
+          }}
         />
         <Input
           w={{ base: "100%", md: "100%" }}
@@ -51,6 +53,9 @@ export default function SignInForm({navigation}) {
             <Icon as={<MaterialIcons name="lock" />} size={6} ml="2" />
           }
           placeholder="Password"
+          onChangeText={(newText) => {
+            user.password = newText;
+          }}
         />
       </Stack>
     );
@@ -60,7 +65,7 @@ export default function SignInForm({navigation}) {
       <Box style={styles.margin}>
         <Button
           style={{ marginVertical: 10 }}
-          onPress={() => console.log("hello world")}
+          onPress={() => console.log(user)}
         >
           Sign In
         </Button>
@@ -76,7 +81,7 @@ export default function SignInForm({navigation}) {
   };
   return (
     <NativeBaseProvider>
-      <Center flex={1} style={styles.margin}>
+      <Center style={styles.margin}>
         <InputForm />
       </Center>
       <TouchableOpacity>
@@ -87,7 +92,7 @@ export default function SignInForm({navigation}) {
         <Text>Don't have account?</Text>
         <TouchableOpacity
           onPress={() => {
-            navigation.navigate("SignUp");
+            navigation.push("SignUp");
           }}
         >
           <Text style={{ color: color.Teal, marginHorizontal: 5 }}>

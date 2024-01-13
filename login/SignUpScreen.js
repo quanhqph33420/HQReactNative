@@ -1,10 +1,27 @@
-import { View, StyleSheet, Text, ScrollView, Image } from "react-native";
+import {
+  View,
+  StyleSheet,
+  Text,
+  ScrollView,
+  Image,
+  TouchableOpacity,
+} from "react-native";
 import SignUpForm from "./form/SignUpForm";
 import Color from "../src/color";
+import { MaterialIcons } from "@expo/vector-icons";
 
 export default function SignUpScreen({ navigation }) {
   return (
     <ScrollView>
+      <View style={{ margin: 20 }}>
+        <TouchableOpacity
+          onPress={function () {
+            navigation.goBack();
+          }}
+        >
+          <MaterialIcons name="arrow-back" size={30} />
+        </TouchableOpacity>
+      </View>
       {/* header */}
       <View style={styles.header}>
         <Image style={styles.image} source={require("../src/signUpImg.png")} />
@@ -20,8 +37,6 @@ export default function SignUpScreen({ navigation }) {
 }
 const styles = StyleSheet.create({
   header: {
-    flex: 4,
-    marginTop: 30,
     alignItems: "center",
   },
   image: {
@@ -38,7 +53,6 @@ const styles = StyleSheet.create({
     color: Color.Teal,
   },
   body: {
-    flex: 6,
     marginTop: 50,
   },
 });

@@ -4,7 +4,7 @@ import Color from "../src/color";
 
 export default function SignInScreen({ navigation }) {
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView>
       {/* header */}
       <View style={styles.header}>
         <Image source={require("../src/img_main.png")} style={styles.image} />
@@ -19,14 +19,7 @@ export default function SignInScreen({ navigation }) {
   );
 }
 const styles = StyleSheet.create({
-  container: {
-    flex: 10,
-  },
-  cushion: {
-    flex: 1,
-  },
   header: {
-    flex: 4,
     marginTop: 50,
     alignItems: "center",
   },
@@ -44,7 +37,6 @@ const styles = StyleSheet.create({
     color: Color.Teal,
   },
   body: {
-    flex: 6,
     marginTop: 50,
   },
 });
