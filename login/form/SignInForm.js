@@ -14,9 +14,9 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { Text, StyleSheet, TouchableOpacity } from "react-native";
 import color from "../../src/color";
 import User from "../../model/userModel";
-
 export default function SignInForm({ navigation }) {
   const user = new User.user();
+
   const InputForm = () => {
     const [show, setShow] = React.useState(false);
     return (
@@ -60,12 +60,15 @@ export default function SignInForm({ navigation }) {
       </Stack>
     );
   };
+
   const ButtonForm = () => {
     return (
       <Box style={styles.margin}>
         <Button
           style={{ marginVertical: 10 }}
-          onPress={() => console.log(user)}
+          onPress={() => {
+            
+          }}
         >
           Sign In
         </Button>
