@@ -1,13 +1,15 @@
 const express = require("express"),
   dotenv = require("dotenv").config(),
   mongoose = require("mongoose"),
-  router = require("./router/loginRouter");
+  routerLogin = require("./router/loginRouter"),
+  getEnv = require("./controller/getEnv"),
+  routerProduct = require("./router/productRouter");
 
 const app = express();
 app.use(express.json());
-const port = process.env.PORT;
-const db_name = process.env.DATABASE;
-const db_url = process.env.URL_DATABASE;
+const port = getEnv.getPort();
+const db_name = getEnv.getDatabase();
+const db_url = getEnv.getUrlDatabase();
 
 mongoose
   .connect(db_url + db_name)
@@ -17,12 +19,11 @@ mongoose
   .catch(function (err) {
     console.log(err);
   });
-  
-app.get("/", (req, res) => {
-  res.send("");
-});
 
-app.use("/login", router);
-app.listen(port || 8000, () => {
-  console.log(`Listening ${port}...`);
+app.get("/", (req, res) => res.send(""));
+
+app.use("/login", routerLogin);
+app.use("/products", routerProduct);
+app.listen(port, () => {
+  console.log("Sever running in " + port + "...");
 });

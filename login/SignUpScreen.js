@@ -13,7 +13,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 export default function SignUpScreen({ navigation }) {
   return (
     <ScrollView>
-      <View style={{ margin: 20 }}>
+      <View style={{ marginLeft:20, marginTop:50 }}>
         <TouchableOpacity
           onPress={function () {
             navigation.goBack();

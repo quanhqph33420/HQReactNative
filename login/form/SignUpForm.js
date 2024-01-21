@@ -11,18 +11,35 @@ import {
   Button,
 } from "native-base";
 import { MaterialIcons } from "@expo/vector-icons";
-import { useState } from "react";
-import { Text, StyleSheet, TouchableOpacity } from "react-native";
+import { Text, StyleSheet, TouchableOpacity, ToastAndroid } from "react-native";
 import color from "../../src/color";
+import User from "../../model/userModel";
+import API from "../../api/APILogin";
 
 export default function SignUpForm({ navigation }) {
-  const [text, setText] = useState({
-    username: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-  });
-  const InputForm = () => {
+  const user = new User.user();
+  var confirmPassword;
+  reloadCallBack();
+
+  function reloadCallBack() {
+    user.username = "";
+    user.email = "";
+    user.fullname = "";
+    user.phone = "";
+    user.password = "";
+    confirmPassword = "";
+  }
+  function Toast(data) {
+    ToastAndroid.showWithGravityAndOffset(
+      data,
+      ToastAndroid.LONG,
+      ToastAndroid.BOTTOM,
+      25,
+      50
+    );
+  }
+  // input
+  function InputForm() {
     const [showPass, setShowPass] = React.useState(false);
     const [showConPass, setShowConPass] = React.useState(false);
     return (
@@ -34,7 +51,9 @@ export default function SignUpForm({ navigation }) {
             <Icon as={<MaterialIcons name="person" />} size={7} ml="2" />
           }
           placeholder="Username"
+          onChangeText={(newText) => (user.username = newText)}
         />
+
         <Input
           w={{ base: "100%", md: "100%" }}
           size={12}
@@ -42,6 +61,29 @@ export default function SignUpForm({ navigation }) {
             <Icon as={<MaterialIcons name="email" />} size={6} ml="2" />
           }
           placeholder="Email"
+          onChangeText={(newText) => (user.email = newText)}
+        />
+        <Input
+          w={{ base: "100%", md: "100%" }}
+          size={12}
+          InputLeftElement={
+            <Icon
+              as={<MaterialIcons name="drive-file-rename-outline" />}
+              size={6}
+              ml="2"
+            />
+          }
+          placeholder="Fullname"
+          onChangeText={(newText) => (user.fullname = newText)}
+        />
+        <Input
+          w={{ base: "100%", md: "100%" }}
+          size={12}
+          InputLeftElement={
+            <Icon as={<MaterialIcons name="local-phone" />} size={6} ml="2" />
+          }
+          placeholder="Phone"
+          onChangeText={(newText) => (user.phone = newText)}
         />
         {/*  */}
         <Input
@@ -65,6 +107,7 @@ export default function SignUpForm({ navigation }) {
             <Icon as={<MaterialIcons name="lock" />} size={6} ml="2" />
           }
           placeholder="Password"
+          onChangeText={(newText) => (user.password = newText)}
         />
         {/*  */}
         <Input
@@ -88,43 +131,64 @@ export default function SignUpForm({ navigation }) {
             <Icon as={<MaterialIcons name="lock" />} size={6} ml="2" />
           }
           placeholder="Confirm Password"
+          onChangeText={(newText) => (confirmPassword = newText)}
         />
       </Stack>
     );
-  };
-  const ButtonForm = () => {
+  }
+  // button
+  function ButtonForm() {
+    async function signUp() {
+      if (
+        user.username == "" ||
+        user.email == "" ||
+        user.password == "" ||
+        user.fullname == "" ||
+        user.phone == "" ||
+        confirmPassword == ""
+      ) {
+        Toast("Username or Password or Email is empty!");
+      } else if (user.password != confirmPassword) {
+        Toast("Password and confirm Password different!");
+      } else {
+        const result = await API.signUp(user);
+        if (result != false) {
+          result == 1 ? Toast("Sign Up complete!") : Toast("Username exist!");
+        }
+      }
+    }
     return (
       <Box style={styles.margin}>
-        <Button
-          style={{ marginVertical: 10 }}
-          onPress={() => console.log("hello world")}
-        >
-          Sign In
+        <TouchableOpacity>
+          <Text style={[styles.margin, styles.text]}>Forgot Password?</Text>
+        </TouchableOpacity>
+        <Button style={{ marginVertical: 10 }} onPress={signUp}>
+          Sign Up
         </Button>
+        <View style={styles.containerText}>
+          <Text>If have account?</Text>
+          <TouchableOpacity onPress={() => navigation.navigate("SignIn")}>
+            <Text
+              style={{
+                color: color.Teal,
+                marginHorizontal: 5,
+                marginBottom: 30,
+              }}
+            >
+              Sign In
+            </Text>
+          </TouchableOpacity>
+        </View>
       </Box>
     );
-  };
+  }
+  //
   return (
     <NativeBaseProvider>
       <Center style={styles.margin}>
         <InputForm />
       </Center>
-      <TouchableOpacity>
-        <Text style={[styles.margin, styles.text]}>Forgot Password?</Text>
-      </TouchableOpacity>
       <ButtonForm />
-      <View style={styles.containerText}>
-        <Text>If have account?</Text>
-        <TouchableOpacity
-          onPress={() => {
-            navigation.navigate("SignIn");
-          }}
-        >
-          <Text style={{ color: color.Teal, marginHorizontal: 5 }}>
-            Sign In
-          </Text>
-        </TouchableOpacity>
-      </View>
     </NativeBaseProvider>
   );
 }

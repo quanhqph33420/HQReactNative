@@ -2,6 +2,7 @@ const express = require("express"),
   router = express.Router(),
   controller = require("../controller/loginController");
 
-router.get("/signIn", controller.signIn);
+router.post("/signIn", controller.signIn);
+router.post("/signUp", controller.signUp);
 
 module.exports = router;
