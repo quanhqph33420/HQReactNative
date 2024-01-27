@@ -49,7 +49,13 @@ export default function UserScreen({ navigation }) {
                 >
                   Cancel
                 </Button>
-                <Button colorScheme="danger" onPress={onClose}>
+                <Button
+                  colorScheme="danger"
+                  onPress={function () {
+                    setIsOpen(false);
+                    navigation.navigate("SignIn");
+                  }}
+                >
                   Log out
                 </Button>
               </Button.Group>

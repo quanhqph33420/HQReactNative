@@ -12,10 +12,12 @@ import {
 } from "react-native";
 import SliderShow from "../welcome/SliderShow";
 import ItemProduct from "../welcome/ItemProduct";
-export default function HomeScreen() {
+import color from "../src/color";
+
+export default function HomeScreen({ navigation }) {
   const [data, setData] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
-  const url = "http://192.168.202.55:8080/products/";
+  const url = color.url;
 
   async function getProducts() {
     try {
@@ -43,7 +45,6 @@ export default function HomeScreen() {
         alignItems="center"
       >
         <Text style={{ fontSize: 30, fontWeight: "bold", flex: 1 }}>Main</Text>
-
         <TouchableOpacity>
           <Avatar
             bg="amber.500"
@@ -61,6 +62,7 @@ export default function HomeScreen() {
       setRefreshing(true);
       await getProducts();
     }, []);
+
     const shirt = data.filter((e) => e.productType == "shirt");
     const pants = data.filter((e) => e.productType == "pants");
     const shoes = data.filter((e) => e.productType == "shoes");
@@ -81,19 +83,45 @@ export default function HomeScreen() {
             <FlatList
               data={shirt}
               horizontal={true}
-              renderItem={({ item }) => <ItemProduct item={item} />}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  onPress={() =>
+                    navigation.push("ProductScreen", { itemId: item._id })
+                  }
+                >
+                  <ItemProduct item={item} />
+                </TouchableOpacity>
+              )}
             />
+
             <Text style={styles.textHeader}>Pants</Text>
             <FlatList
               data={pants}
               horizontal={true}
-              renderItem={({ item }) => <ItemProduct item={item} />}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  onPress={() =>
+                    navigation.push("ProductScreen", { itemId: item._id })
+                  }
+                >
+                  <ItemProduct item={item} />
+                </TouchableOpacity>
+              )}
             />
+
             <Text style={styles.textHeader}>Shoes</Text>
             <FlatList
               data={shoes}
               horizontal={true}
-              renderItem={({ item }) => <ItemProduct item={item} />}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  onPress={() =>
+                    navigation.push("ProductScreen", { itemId: item._id })
+                  }
+                >
+                  <ItemProduct item={item} />
+                </TouchableOpacity>
+              )}
             />
           </ScrollView>
         )}

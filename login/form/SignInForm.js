@@ -15,14 +15,13 @@ import { Text, StyleSheet, TouchableOpacity, ToastAndroid } from "react-native";
 import color from "../../src/color";
 import User from "../../model/userModel";
 import API from "../../api/APILogin";
+import Storage from "../../api/Storage";
 
 export default function SignInForm({ navigation }) {
   const user = new User.user();
-  reload();
-  function reload() {
-    user.username = "";
-    user.password = "";
-  }
+  user.username = "";
+  user.password = "";
+
   function Toast(data) {
     ToastAndroid.showWithGravityAndOffset(
       data,
@@ -78,9 +77,13 @@ export default function SignInForm({ navigation }) {
       Toast("Username or Password empty!");
     } else {
       const result = await API.signIn(user);
-      result == 1
-        ? navigation.navigate("Main")
-        : Toast("Username or Password incorrect!");
+      if (result != "") {
+        await Storage.storeData("@infoUser", result);
+        //day len sever de lay chuoi ma hoa jwt
+        navigation.navigate("Main");
+      } else {
+        Toast("Username or Password incorrect!");
+      }
     }
   }
 

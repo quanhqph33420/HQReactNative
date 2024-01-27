@@ -3,14 +3,12 @@ import { Dimensions } from "react-native";
 
 const { width, height } = Dimensions.get("window");
 export default function ItemProduct({ item }) {
+  function eArabic(x) {
+    return parseInt(x).toLocaleString("en-ES");
+  }
   return (
     <View style={{ width: width * 0.5, padding: 10 }}>
-      <View
-        style={{
-          backgroundColor: "white",
-          borderRadius: 5,
-        }}
-      >
+      <View style={styles.containerItem}>
         <Image source={{ uri: item.imageUri }} style={styles.itemImage} />
         <Text numberOfLines={1} ellipsizeMode="tail" style={styles.itemName}>
           {item.productName}
@@ -19,7 +17,7 @@ export default function ItemProduct({ item }) {
           <View
             style={{ justifyContent: "space-between", flexDirection: "row" }}
           >
-            <Text style={styles.itemPrice}>đ{item.price}</Text>
+            <Text style={styles.itemPrice}>₫{eArabic(item.info[0].price)}</Text>
             <Text style={styles.itemSold}>Sold {item.sold}</Text>
           </View>
           <Text style={styles.itemSold}>Rate {item.rating}</Text>
@@ -60,5 +58,9 @@ const styles = StyleSheet.create({
     marginLeft: 6,
     marginTop: 3,
     marginBottom: 10,
+  },
+  containerItem: {
+    backgroundColor: "white",
+    borderRadius: 5,
   },
 });

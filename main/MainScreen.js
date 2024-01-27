@@ -1,6 +1,6 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import HomeScreen from "./HomeScreen";
-import ProductScreen from "./ProductScreen";
+import ListProducts from "./products/ListProducts";
 import Icon from "react-native-vector-icons/Ionicons";
 import UserScreen from "./profile/UserScreen";
 import CartScreen from "./CartScreen";
@@ -72,7 +72,7 @@ export default function MainScreen() {
         />
         <Tab.Screen
           name="Product"
-          component={ProductScreen}
+          component={ListProducts}
           options={{
             tabBarLabel: "Search",
             tabBarIcon: ({ color, size }) => (

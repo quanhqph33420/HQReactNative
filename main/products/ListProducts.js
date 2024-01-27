@@ -9,14 +9,15 @@ import {
   FlatList,
 } from "react-native";
 
-import { FlatGrid } from "react-native-super-grid";
 import { Input, Icon } from "native-base";
+import color from "../../src/color";
 import { MaterialIcons } from "@expo/vector-icons";
-import ItemProduct from "../welcome/ItemProduct";
-export default function ProductScreen() {
+import ItemProduct from "../../welcome/ItemProduct";
+
+export default function ListProducts({ navigation }) {
   const [data, setData] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
-  const url = "http://192.168.202.55:8080/products/";
+  const url = color.url;
 
   async function getProducts() {
     try {
@@ -54,7 +55,7 @@ export default function ProductScreen() {
             <Avatar
               bg="amber.500"
               size={10}
-              source={require("../src/main.jpg")}
+              source={require("../../src/main.jpg")}
             />
           </TouchableOpacity>
         </View>
@@ -80,7 +81,15 @@ export default function ProductScreen() {
             refreshControl={
               <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
             }
-            renderItem={({ item }) => <ItemProduct item={item} />}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                onPress={() =>
+                  navigation.push("ProductScreen", { itemId: item._id })
+                }
+              >
+                <ItemProduct item={item} />
+              </TouchableOpacity>
+            )}
           />
         )}
       </View>

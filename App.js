@@ -5,13 +5,22 @@ import SignUpScreen from "./login/SignUpScreen";
 import MainScreen from "./main/MainScreen";
 import UserScreen from "./main/profile/UserScreen";
 import ProfileScreen from "./main/profile/ProfileScreen";
+import Welcome from "./welcome/Welcome";
+import ListProducts from "./main/products/ListProducts";
+import ProductScreen from "./main/products/ProductScreen";
+import ItemCart from "./welcome/ItemCart";
 
 const Stack = createNativeStackNavigator();
 
 function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="SignIn">
+      <Stack.Navigator initialRouteName="welcome">
+        <Stack.Screen
+          name="welcome"
+          options={{ headerShown: false }}
+          component={Welcome}
+        />
         <Stack.Screen
           name="SignIn"
           options={{ headerShown: false }}
@@ -36,6 +45,21 @@ function App() {
           name="profile"
           options={{ headerShown: false }}
           component={ProfileScreen}
+        />
+        <Stack.Screen
+          name="ListProducts"
+          options={{ headerShown: false }}
+          component={ListProducts}
+        />
+        <Stack.Screen
+          name="ProductScreen"
+          options={{ headerShown: false }}
+          component={ProductScreen}
+        />
+        <Stack.Screen
+          name="ItemCart"
+          options={{ headerShown: false }}
+          component={ItemCart}
         />
       </Stack.Navigator>
     </NavigationContainer>

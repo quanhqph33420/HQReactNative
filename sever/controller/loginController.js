@@ -5,7 +5,9 @@ class loginController {
     const password = req.body.password;
     await userModel
       .find({ username: username, password: password })
-      .then((result) => res.json(result.length))
+      .then((result) => {
+        result == "" ? res.json("") : res.json(result[0]._id);
+      })
       .catch((err) => console.log(err));
   }
   async signUp(req, res) {

@@ -3,5 +3,6 @@ const express = require("express"),
   controller = require("../controller/productController");
 
 router.get("/getProducts", controller.getProducts);
+router.post("/getItemProduct", controller.getItemProduct);
 
 module.exports = router;
