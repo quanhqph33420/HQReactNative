@@ -3,7 +3,8 @@ const express = require("express"),
   mongoose = require("mongoose"),
   routerLogin = require("./router/loginRouter"),
   getEnv = require("./controller/getEnv"),
-  routerProduct = require("./router/productRouter");
+  routerProduct = require("./router/productRouter"),
+  routerCart = require("./router/shoppingCart");
 
 const app = express();
 app.use(express.json());
@@ -24,6 +25,7 @@ app.get("/", (req, res) => res.send(""));
 
 app.use("/login", routerLogin);
 app.use("/products", routerProduct);
+app.use("/cart", routerCart);
 app.listen(port, () => {
   console.log("Sever running in " + port + "...");
 });

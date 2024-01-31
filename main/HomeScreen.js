@@ -1,5 +1,11 @@
 import React from "react";
-import { Avatar, HStack, Center, NativeBaseProvider } from "native-base";
+import {
+  Avatar,
+  HStack,
+  Center,
+  NativeBaseProvider,
+  Button,
+} from "native-base";
 import {
   TouchableOpacity,
   StyleSheet,
@@ -13,6 +19,7 @@ import {
 import SliderShow from "../welcome/SliderShow";
 import ItemProduct from "../welcome/ItemProduct";
 import color from "../src/color";
+import { MaterialIcons } from "@expo/vector-icons";
 
 export default function HomeScreen({ navigation }) {
   const [data, setData] = React.useState([]);
@@ -45,13 +52,51 @@ export default function HomeScreen({ navigation }) {
         alignItems="center"
       >
         <Text style={{ fontSize: 30, fontWeight: "bold", flex: 1 }}>Main</Text>
-        <TouchableOpacity>
-          <Avatar
-            bg="amber.500"
-            size={10}
-            source={require("../src/main.jpg")}
-          />
-        </TouchableOpacity>
+        <View style={{ flexDirection: "row" }}>
+          <TouchableOpacity
+            style={{
+              padding: 5,
+            }}
+            onPress={() => {
+              navigation.push("ListProducts");
+            }}
+          >
+            <MaterialIcons
+              style={styles.icon}
+              color="#878787"
+              name="search"
+              size={30}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              navigation.push("Cart");
+            }}
+            style={{
+              borderRadius: 30,
+              padding: 5,
+              marginRight: 10,
+            }}
+          >
+            <MaterialIcons
+              style={styles.icon}
+              color="#878787"
+              name="shopping-cart"
+              size={30}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              navigation.push("user");
+            }}
+          >
+            <Avatar
+              bg="amber.500"
+              size={10}
+              source={require("../src/main.jpg")}
+            />
+          </TouchableOpacity>
+        </View>
       </HStack>
     );
   }

@@ -12,27 +12,32 @@ import { MaterialIcons } from "@expo/vector-icons";
 
 export default function SignUpScreen({ navigation }) {
   return (
-    <ScrollView>
-      <View style={{ marginLeft:20, marginTop:50 }}>
-        <TouchableOpacity
-          onPress={function () {
-            navigation.goBack();
-          }}
-        >
-          <MaterialIcons name="arrow-back" size={30} />
-        </TouchableOpacity>
-      </View>
-      {/* header */}
-      <View style={styles.header}>
-        <Image style={styles.image} source={require("../src/signUpImg.png")} />
-        <Text style={styles.textBig}>Create account</Text>
-        <Text style={styles.textSmall}>Create account to login</Text>
-      </View>
-      {/* body */}
-      <View style={styles.body}>
-        <SignUpForm navigation={navigation} />
-      </View>
-    </ScrollView>
+    <View>
+      <ScrollView>
+        <View style={{ marginLeft: 20, marginTop: 50 }}>
+          <TouchableOpacity
+            onPress={function () {
+              navigation.goBack();
+            }}
+          >
+            <MaterialIcons name="arrow-back" size={30} />
+          </TouchableOpacity>
+        </View>
+        {/* header */}
+        <View style={styles.header}>
+          <Image
+            style={styles.image}
+            source={require("../src/signUpImg.png")}
+          />
+          <Text style={styles.textBig}>Create account</Text>
+          <Text style={styles.textSmall}>Create account to login</Text>
+        </View>
+        {/* body */}
+        <View style={styles.body}>
+          <SignUpForm navigation={navigation} />
+        </View>
+      </ScrollView>
+    </View>
   );
 }
 const styles = StyleSheet.create({

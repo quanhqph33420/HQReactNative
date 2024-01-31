@@ -39,9 +39,29 @@ export default function ListProducts({ navigation }) {
     return (
       <HStack px="3" padding="2" marginTop="10" alignItems="center">
         <View style={{ flexDirection: "row", flex: 1, marginRight: 5 }}>
+          <View style={{ marginTop: 5, marginRight: 10 }}>
+            <TouchableOpacity
+              onPress={() => {
+                navigation.goBack();
+              }}
+              style={{
+                backgroundColor: "#878787",
+                borderRadius: 30,
+                opacity: 0.9,
+              }}
+            >
+              <MaterialIcons
+                name="arrow-back"
+                color="white"
+                size={35}
+                style={styles.icon}
+              />
+            </TouchableOpacity>
+          </View>
+
           <Input
             w={{
-              base: "90%",
+              base: "80%",
               md: "25%",
             }}
             variant="rounded"

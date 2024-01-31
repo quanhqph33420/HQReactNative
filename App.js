@@ -2,13 +2,14 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import SignInScreen from "./login/SignInScreen";
 import SignUpScreen from "./login/SignUpScreen";
-import MainScreen from "./main/MainScreen";
+import HomeScreen from "./main/HomeScreen";
 import UserScreen from "./main/profile/UserScreen";
 import ProfileScreen from "./main/profile/ProfileScreen";
 import Welcome from "./welcome/Welcome";
 import ListProducts from "./main/products/ListProducts";
 import ProductScreen from "./main/products/ProductScreen";
 import ItemCart from "./welcome/ItemCart";
+import CartScreen from "./main/CartScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -34,7 +35,7 @@ function App() {
         <Stack.Screen
           name="Main"
           options={{ headerShown: false }}
-          component={MainScreen}
+          component={HomeScreen}
         />
         <Stack.Screen
           name="user"
@@ -60,6 +61,11 @@ function App() {
           name="ItemCart"
           options={{ headerShown: false }}
           component={ItemCart}
+        />
+        <Stack.Screen
+          name="Cart"
+          options={{ headerShown: false }}
+          component={CartScreen}
         />
       </Stack.Navigator>
     </NavigationContainer>

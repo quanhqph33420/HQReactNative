@@ -1,8 +1,77 @@
 import React from "react";
-import { Avatar, HStack, Center, NativeBaseProvider } from "native-base";
-import { TouchableOpacity, StyleSheet, Text } from "react-native";
+import {
+  Avatar,
+  HStack,
+  Center,
+  NativeBaseProvider,
+  Button,
+} from "native-base";
+import {
+  TouchableOpacity,
+  StyleSheet,
+  Text,
+  ActivityIndicator,
+  FlatList,
+  View,
+  RefreshControl,
+  ToastAndroid,
+} from "react-native";
+import color from "../src/color";
+import axios from "axios";
+import Storage from "../api/Storage";
+import ItemCart from "../welcome/ItemCart";
+import API from "../api/ShoppingCart";
+import { MaterialIcons } from "@expo/vector-icons";
+import { set } from "mongoose";
 
-export default function CartScreen() {
+export default function CartScreen({ navigation }) {
+  const [loading, setLoading] = React.useState(true);
+  const [data, setData] = React.useState([]);
+  const [price, setPrice] = React.useState(0);
+  const listItem = [];
+
+  const url = color.cart;
+  function Toast(data) {
+    ToastAndroid.showWithGravityAndOffset(
+      data,
+      ToastAndroid.LONG,
+      ToastAndroid.BOTTOM,
+      25,
+      50
+    );
+  }
+  async function getData() {
+    const id = await Storage.getData("@infoUser");
+    await axios
+      .post(`${url}getProductCart`, { id_: id })
+      .then((result) => {
+        setData(result.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }
+
+  React.useEffect(() => {
+    getData();
+  }, []);
+
+  async function deleteProduct() {
+    const listFilter = listItem.filter((val) => val.status);
+    const idUser = await Storage.getData("@infoUser");
+    if (listFilter.length != 0) {
+      listFilter.push({ idUser: idUser });
+      const result = await API.removeProduct(listFilter);
+      if (result != 0) {
+        Toast(`You delete ${result} product!`);
+        await getData();
+      } else Toast("You don't selected product!");
+    } else Toast("You don't selected product!");
+  }
+
   function NavigationBar() {
     return (
       <HStack
@@ -12,9 +81,26 @@ export default function CartScreen() {
         marginTop="10"
         alignItems="center"
       >
-        <Text style={{ fontSize: 30, fontWeight: "bold", flex: 1 }}>Cart</Text>
-
-        <TouchableOpacity style={{ marginLeft: 5 }}>
+        <TouchableOpacity
+          style={{ flex: 1 }}
+          onPress={() => {
+            navigation.goBack();
+          }}
+        >
+          <MaterialIcons name="arrow-back" size={30} color="#333" />
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={deleteProduct}
+          style={{ marginHorizontal: 10 }}
+        >
+          <MaterialIcons name="delete" size={30} color="#878787" />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={{ marginLeft: 5 }}
+          onPress={() => {
+            navigation.navigate("user");
+          }}
+        >
           <Avatar
             bg="amber.500"
             size={10}
@@ -24,12 +110,72 @@ export default function CartScreen() {
       </HStack>
     );
   }
+
+  function ListItem() {
+    const [refreshing, setRefreshing] = React.useState(false);
+    const onRefresh = React.useCallback(async () => {
+      setRefreshing(true);
+      await getData();
+    }, []);
+
+    function addListItem(price, id, status) {
+      const checkItem = listItem.filter((val) => val.id == id);
+      if (checkItem == 0) {
+        listItem.push({ id: id, price: price, status: status });
+      } else {
+        const index = listItem.findIndex((val) => val.id == id);
+        listItem[index] = { id: id, price: price, status: status };
+      }
+      let total = 0;
+      const list = listItem.filter((val) => val.status == true);
+      list.map((val) => (total += val.price));
+      setPrice(total);
+    }
+    return (
+      <View style={{ flex: 1 }}>
+        {loading ? (
+          <ActivityIndicator />
+        ) : (
+          <FlatList
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
+            data={data[0]}
+            renderItem={({ item }) => (
+              <ItemCart item={item} onQuantityChange={addListItem} />
+            )}
+          />
+        )}
+        {loading ? (
+          console.log()
+        ) : (
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+              paddingVertical: 20,
+            }}
+          >
+            <View style={{ marginLeft: 10, flexDirection: "row" }}>
+              <Text style={{ opacity: 0.6, marginTop: 4 }}>Total price </Text>
+              <Text style={{ fontSize: 18, color: "red" }}>₫{price}</Text>
+            </View>
+            <Button w="30%" marginRight={2}>
+              Buy
+            </Button>
+          </View>
+        )}
+      </View>
+    );
+  }
+
   return (
     <NativeBaseProvider>
       <Center>
         <NavigationBar />
       </Center>
-  
+      <ListItem />
     </NativeBaseProvider>
   );
 }

@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
   Image,
   RefreshControl,
+  ToastAndroid,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Dimensions } from "react-native";
@@ -16,12 +17,16 @@ const { width, height } = Dimensions.get("window");
 import color from "../../src/color";
 import axios from "axios";
 const url = color.url;
+import API from "../../api/ShoppingCart";
+import Storage from "../../api/Storage";
 import {
   Actionsheet,
   useDisclose,
   Box,
   Center,
   NativeBaseProvider,
+  Button,
+  Divider,
 } from "native-base";
 
 export default function ProductScreen({ route, navigation }) {
@@ -30,12 +35,23 @@ export default function ProductScreen({ route, navigation }) {
   const [loading, setLoading] = React.useState(true);
   const [refreshing, setRefreshing] = React.useState(false);
   const { isOpen, onOpen, onClose } = useDisclose();
+  const [status, setStatus] = React.useState(false);
+  const [loadList, setLoadList] = React.useState(true);
 
   const onRefresh = React.useCallback(async () => {
     setRefreshing(true);
     await getItem();
   }, []);
 
+  function Toast(data) {
+    ToastAndroid.showWithGravityAndOffset(
+      data,
+      ToastAndroid.LONG,
+      ToastAndroid.BOTTOM,
+      25,
+      50
+    );
+  }
   const getItem = async () => {
     try {
       const response = await axios.post(`${url}getItemProduct`, itemId);
@@ -46,48 +62,160 @@ export default function ProductScreen({ route, navigation }) {
     } finally {
       setLoading(false);
       setRefreshing(false);
+      setLoadList(false);
     }
   };
-
   React.useEffect(() => {
     getItem();
   }, []);
 
   function ActionSheetView() {
+    const [selectedButton, setSelectedButton] = React.useState(null);
+    const [info, setInfo] = React.useState({ price: 0, quantity: 0, size: "" });
+    var [quantity, setQuantity] = React.useState(1);
+
+    const toggleColorMode = (index, text) => {
+      setSelectedButton(index == selectedButton ? null : index);
+      setQuantity(1);
+      data[0].info[index].size == text
+        ? setInfo(data[0].info[index])
+        : setInfo({ price: 0, quantity: 0, size: "" });
+    };
+
+    function decreaseNumber() {
+      if (info.quantity != "") {
+        if (quantity > 1) {
+          setQuantity(quantity - 1);
+        }
+      }
+    }
+
+    function increaseNumber() {
+      if (info.quantity != "") {
+        if (quantity < info.quantity) {
+          setQuantity(quantity + 1);
+        }
+      }
+    }
+
+    async function shoppingCartOrBuyNow() {
+      if (info.quantity != "") {
+        const idUs = await Storage.getData("@infoUser");
+        if (status == true) {
+          const result = await API.addProductToCart({
+            idUser: idUs,
+            id: data[0]._id,
+            name: data[0].productName,
+            img: data[0].imageUri,
+            price: info.price,
+            size: info.size,
+          });
+          result == 1
+            ? Toast("Add product to cart complete!")
+            : Toast("Product exist!");
+        }
+      } else Toast("You don't selected product!");
+    }
+
     return (
       <Center>
         <Actionsheet isOpen={isOpen} onClose={onClose}>
           <Actionsheet.Content>
-            <Box w="100%" h={200}>
-              <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <Box w="100%" h={400}>
+              <View style={styles.row}>
                 <Image
                   source={{ uri: data[0].imageUri }}
                   height={150}
                   width={150}
                   resizeMode="center"
+                  style={{ margin: 10 }}
                 />
                 <View style={{ marginTop: 90 }}>
-                  <Text style={{ color: "red", fontSize: 18 }}>₫2900000</Text>
-                  <Text
-                    style={{ opacity: 0.6, fontSize: 13, marginVertical: 10 }}
-                  >
-                    Quantity: 2
+                  <Text style={{ color: "red", fontSize: 18 }}>
+                    ₫{info.price}
                   </Text>
+                  <Text style={styles.quantity}>Quantity: {info.quantity}</Text>
                 </View>
               </View>
-              <View
-                style={{ backgroundColor: "black", opacity: 0.1, height: 1 }}
+              <Divider
+                _light={{
+                  bg: "muted.800",
+                }}
+                _dark={{
+                  bg: "muted.50",
+                }}
+                w="100%"
+                opacity={0.3}
               />
               <View style={{ margin: 10 }}>
                 <Text>Size</Text>
-                
               </View>
+              <ScrollView horizontal>
+                {data[0].info.map((val, index) => (
+                  <Button
+                    size="sm"
+                    colorScheme={
+                      index == selectedButton ? "secondary" : "primary"
+                    }
+                    width={100}
+                    height={8}
+                    marginX={1}
+                    fontWeight="bold"
+                    key={index}
+                    onPress={() => toggleColorMode(index, val.size)}
+                  >
+                    {val.size}
+                  </Button>
+                ))}
+              </ScrollView>
+              <Divider
+                _light={{
+                  bg: "muted.800",
+                }}
+                _dark={{
+                  bg: "muted.50",
+                }}
+                w="100%"
+                opacity={0.3}
+              />
+              <View style={styles.space}>
+                <Text style={{ margin: 10 }}>Quantity</Text>
+                <View style={[styles.row, { margin: 10 }]}>
+                  <Button
+                    colorScheme="emerald"
+                    borderWidth={0.5}
+                    borderColor="#333"
+                    onPress={decreaseNumber}
+                  >
+                    <MaterialIcons name="remove" color={"#fff"} size={8} />
+                  </Button>
+                  <Text style={{ marginHorizontal: 10 }}>{quantity}</Text>
+                  <Button
+                    colorScheme="emerald"
+                    borderWidth={0.5}
+                    borderColor="#333"
+                    onPress={increaseNumber}
+                  >
+                    <MaterialIcons name="add" color={"#fff"} size={8} />
+                  </Button>
+                </View>
+              </View>
+              <Divider w="100%" />
+              <Button
+                onPress={shoppingCartOrBuyNow}
+                marginBottom={5}
+                marginTop={5}
+                w="100%"
+              >
+                Confirm
+              </Button>
             </Box>
           </Actionsheet.Content>
         </Actionsheet>
       </Center>
     );
   }
+
   function NavigationBar() {
     return (
       <ImageBackground
@@ -114,7 +242,7 @@ export default function ProductScreen({ route, navigation }) {
                 size={25}
               />
             </TouchableOpacity>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate("Cart")}>
               <MaterialIcons
                 style={styles.icon}
                 color="#fff"
@@ -149,7 +277,7 @@ export default function ProductScreen({ route, navigation }) {
           <Text style={styles.border}> Buy to received gift</Text>
         </View>
         {/*  */}
-        <View style={{ margin: 10, flexDirection: "row" }}>
+        <View style={styles.star}>
           <Text style={styles.like}> Favorite+ </Text>
           <Text
             ellipsizeMode="tail"
@@ -199,12 +327,13 @@ export default function ProductScreen({ route, navigation }) {
   }
   function ButtonForm() {
     return (
-      <View
-        style={{ flexDirection: "row", alignItems: "center", marginBottom: 5 }}
-      >
-        <TouchableOpacity
-          style={{ backgroundColor: "green", width: width * 0.5, height: 40 }}
-          onPress={onOpen}
+      <View style={[{ marginBottom: 5 }, styles.row]}>
+        <Button
+          style={styles.cart}
+          onPress={() => {
+            setStatus(true);
+            onOpen();
+          }}
         >
           <MaterialIcons
             style={{ textAlign: "center", marginTop: 6 }}
@@ -212,42 +341,48 @@ export default function ProductScreen({ route, navigation }) {
             color="#fff"
             size={30}
           />
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={{
-            width: width * 0.5,
-            backgroundColor: "violet",
-            height: 40,
+        </Button>
+        <Button
+          style={styles.buyNowBtn}
+          onPress={() => {
+            setStatus(false);
+            onOpen();
           }}
         >
-          <Text style={{ textAlign: "center", color: "#fff", marginTop: 10 }}>
-            Buy now
-          </Text>
-        </TouchableOpacity>
+          <Text style={styles.buyNow}>Buy now</Text>
+        </Button>
       </View>
     );
   }
 
   return (
-    <ScrollView
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-      }
-    >
-      {loading ? (
-        <ActivityIndicator />
-      ) : (
-        <NativeBaseProvider>
-          <NavigationBar />
-          <Body />
-          <ButtonForm />
-          <ActionSheetView />
-        </NativeBaseProvider>
-      )}
-    </ScrollView>
+    <NativeBaseProvider>
+      <ScrollView
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
+        {loading ? (
+          <ActivityIndicator />
+        ) : (
+          <View>
+            <NavigationBar />
+            <Body />
+            <ActionSheetView />
+          </View>
+        )}
+      </ScrollView>
+      <ButtonForm />
+    </NativeBaseProvider>
   );
 }
 const styles = StyleSheet.create({
+  buyNowBtn: {
+    width: width * 0.5,
+    backgroundColor: "violet",
+    height: 50,
+    paddingTop: -10,
+  },
   containerBar: {
     flexDirection: "row",
     marginHorizontal: 5,
@@ -307,5 +442,29 @@ const styles = StyleSheet.create({
     marginTop: 5,
     fontWeight: "700",
     color: "red",
+  },
+  row: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  space: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  cart: {
+    backgroundColor: "green",
+    width: width * 0.5,
+    height: 50,
+    paddingTop: 0,
+  },
+  buyNow: {
+    textAlign: "center",
+    color: "#fff",
+    marginTop: 10,
+  },
+  quantity: {
+    opacity: 0.6,
+    fontSize: 13,
+    marginVertical: 10,
   },
 });

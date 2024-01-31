@@ -128,6 +128,20 @@ export default function UserScreen({ navigation }) {
           </TouchableOpacity>
         </View>
         <View style={styles.line} />
+        {/* main */}
+        <View style={styles.menu}>
+          <TouchableOpacity
+            style={styles.item}
+            onPress={() => navigation.navigate("Main")}
+          >
+            <View style={styles.item}>
+              <MaterialIcons name="home" size={30} />
+              <Text style={styles.textItem}>Home</Text>
+            </View>
+            <MaterialIcons name="arrow-right" size={35} />
+          </TouchableOpacity>
+        </View>
+        <View style={styles.line} />
         {/* Help */}
         <View style={styles.menu}>
           <TouchableOpacity style={styles.item}>
@@ -139,6 +153,7 @@ export default function UserScreen({ navigation }) {
           </TouchableOpacity>
         </View>
         <View style={styles.line} />
+
         {/* Log out */}
         <View style={styles.menu}>
           <TouchableOpacity
