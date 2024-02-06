@@ -4,7 +4,8 @@ const express = require("express"),
   routerLogin = require("./router/loginRouter"),
   getEnv = require("./controller/getEnv"),
   routerProduct = require("./router/productRouter"),
-  routerCart = require("./router/shoppingCart");
+  routerCart = require("./router/shoppingCart"),
+  routerFavorite = require("./router/favorite");
 
 const app = express();
 app.use(express.json());
@@ -26,6 +27,7 @@ app.get("/", (req, res) => res.send(""));
 app.use("/login", routerLogin);
 app.use("/products", routerProduct);
 app.use("/cart", routerCart);
+app.use("/favorite", routerFavorite);
 app.listen(port, () => {
   console.log("Sever running in " + port + "...");
 });

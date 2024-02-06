@@ -10,7 +10,7 @@ import {
 import { Image, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 
-export default function ItemCart({ item, onQuantityChange }) {
+export default function ItemCart({ item, onQuantityChange, changeProduct }) {
   var [quantity, setQuantity] = React.useState(1);
 
   const [isChecked, setIsChecked] = React.useState(false);
@@ -50,7 +50,7 @@ export default function ItemCart({ item, onQuantityChange }) {
           <Text ellipsizeMode="tail" numberOfLines={1}>
             {item.nameProduct}
           </Text>
-          <TouchableOpacity style={styles.btnChange}>
+          <TouchableOpacity style={styles.btnChange} onPress={changeProduct}>
             <Text style={{ fontSize: 12 }}>Phân loại {item.size} </Text>
             <MaterialIcons name="keyboard-arrow-down" />
           </TouchableOpacity>

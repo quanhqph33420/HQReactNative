@@ -3,8 +3,12 @@ import {
   Avatar,
   HStack,
   Center,
+  Box,
+  Actionsheet,
+  Divider,
   NativeBaseProvider,
   Button,
+  useDisclose,
 } from "native-base";
 import {
   TouchableOpacity,
@@ -15,6 +19,8 @@ import {
   View,
   RefreshControl,
   ToastAndroid,
+  Image,
+  ScrollView,
 } from "react-native";
 import color from "../src/color";
 import axios from "axios";
@@ -22,15 +28,16 @@ import Storage from "../api/Storage";
 import ItemCart from "../welcome/ItemCart";
 import API from "../api/ShoppingCart";
 import { MaterialIcons } from "@expo/vector-icons";
-import { set } from "mongoose";
 
 export default function CartScreen({ navigation }) {
   const [loading, setLoading] = React.useState(true);
   const [data, setData] = React.useState([]);
-  const [price, setPrice] = React.useState(0);
+  const [item, setItem] = React.useState([]);
+  const { isOpen, onOpen, onClose } = useDisclose();
+  const [visible, setVisible] = React.useState(true);
   const listItem = [];
-
   const url = color.cart;
+
   function Toast(data) {
     ToastAndroid.showWithGravityAndOffset(
       data,
@@ -110,9 +117,155 @@ export default function CartScreen({ navigation }) {
       </HStack>
     );
   }
+  function ActionSheetView() {
+    const [selectedButton, setSelectedButton] = React.useState(null);
+    const [info, setInfo] = React.useState({ price: 0, quantity: 0, size: "" });
+    var [quantity, setQuantity] = React.useState(1);
 
+    const toggleColorMode = (index, text) => {
+      setSelectedButton(index == selectedButton ? null : index);
+      setQuantity(1);
+      item[0].info[index].size == text
+        ? setInfo(item[0].info[index])
+        : setInfo({ price: 0, quantity: 0, size: "" });
+    };
+
+    function decreaseNumber() {
+      if (info.quantity != "") {
+        if (quantity > 1) {
+          setQuantity(quantity - 1);
+        }
+      }
+    }
+
+    function increaseNumber() {
+      if (info.quantity != "") {
+        if (quantity < info.quantity) {
+          setQuantity(quantity + 1);
+        }
+      }
+    }
+
+    async function shoppingCartOrBuyNow() {
+      if (info.quantity != "") {
+        const idUs = await Storage.getData("@infoUser");
+        const result = await API.updateProductToCart({
+          idUser: idUs,
+          id: item[0]._id,
+          name: item[0].productName,
+          image: item[0].imageUri,
+          price: info.price,
+          size: info.size,
+        });
+        if (result == 1) {
+          Toast("Update product to cart complete!");
+          await getData();
+          onClose();
+        } else Toast("Product exist!");
+      } else Toast("You don't selected product!");
+    }
+
+    return (
+      <Center>
+        <Actionsheet isOpen={isOpen} onClose={onClose}>
+          <Actionsheet.Content>
+            <Box w="100%" h={400}>
+              <View style={styles.row}>
+                <Image
+                  source={{ uri: item[0].imageUri }}
+                  height={150}
+                  width={150}
+                  resizeMode="center"
+                  style={{ margin: 10 }}
+                />
+                <View style={{ marginTop: 90 }}>
+                  <Text style={{ color: "red", fontSize: 18 }}>
+                    ₫{info.price}
+                  </Text>
+                  <Text style={styles.quantity}>Quantity: {info.quantity}</Text>
+                </View>
+              </View>
+              <Divider
+                _light={{
+                  bg: "muted.800",
+                }}
+                _dark={{
+                  bg: "muted.50",
+                }}
+                w="100%"
+                opacity={0.3}
+              />
+              <View style={{ margin: 10 }}>
+                <Text>Size</Text>
+              </View>
+              <ScrollView horizontal>
+                {item[0].info.map((val, index) => (
+                  <Button
+                    size="sm"
+                    colorScheme={
+                      index == selectedButton ? "secondary" : "primary"
+                    }
+                    width={100}
+                    height={8}
+                    marginX={1}
+                    fontWeight="bold"
+                    key={index}
+                    onPress={() => toggleColorMode(index, val.size)}
+                  >
+                    {val.size}
+                  </Button>
+                ))}
+              </ScrollView>
+              <Divider
+                _light={{
+                  bg: "muted.800",
+                }}
+                _dark={{
+                  bg: "muted.50",
+                }}
+                w="100%"
+                opacity={0.3}
+              />
+              <View style={styles.space}>
+                <Text style={{ margin: 10 }}>Quantity</Text>
+                <View style={[styles.row, { margin: 10 }]}>
+                  <Button
+                    colorScheme="emerald"
+                    borderWidth={0.5}
+                    borderColor="#333"
+                    onPress={decreaseNumber}
+                  >
+                    <MaterialIcons name="remove" color={"#fff"} size={8} />
+                  </Button>
+                  <Text style={{ marginHorizontal: 10 }}>{quantity}</Text>
+                  <Button
+                    colorScheme="emerald"
+                    borderWidth={0.5}
+                    borderColor="#333"
+                    onPress={increaseNumber}
+                  >
+                    <MaterialIcons name="add" color={"#fff"} size={8} />
+                  </Button>
+                </View>
+              </View>
+              <Divider w="100%" />
+              <Button
+                onPress={shoppingCartOrBuyNow}
+                marginBottom={5}
+                marginTop={5}
+                w="100%"
+              >
+                Confirm
+              </Button>
+            </Box>
+          </Actionsheet.Content>
+        </Actionsheet>
+      </Center>
+    );
+  }
   function ListItem() {
     const [refreshing, setRefreshing] = React.useState(false);
+    const [price, setPrice] = React.useState(0);
     const onRefresh = React.useCallback(async () => {
       setRefreshing(true);
       await getData();
@@ -131,6 +284,12 @@ export default function CartScreen({ navigation }) {
       list.map((val) => (total += val.price));
       setPrice(total);
     }
+    async function changeProduct(id) {
+      const result = await API.getProductId({ id: id });
+      setItem(result);
+      setVisible(false);
+      onOpen();
+    }
     return (
       <View style={{ flex: 1 }}>
         {loading ? (
@@ -142,12 +301,16 @@ export default function CartScreen({ navigation }) {
             }
             data={data[0]}
             renderItem={({ item }) => (
-              <ItemCart item={item} onQuantityChange={addListItem} />
+              <ItemCart
+                item={item}
+                onQuantityChange={addListItem}
+                changeProduct={async () => await changeProduct(item.idProduct)}
+              />
             )}
           />
         )}
         {loading ? (
-          console.log()
+          false
         ) : (
           <View
             style={{
@@ -155,6 +318,11 @@ export default function CartScreen({ navigation }) {
               justifyContent: "space-between",
               alignItems: "center",
               paddingVertical: 20,
+              height: 100,
+              position: "absolute",
+              bottom: 0,
+              right: 0,
+              left: 0,
             }}
           >
             <View style={{ marginLeft: 10, flexDirection: "row" }}>
@@ -166,6 +334,9 @@ export default function CartScreen({ navigation }) {
             </Button>
           </View>
         )}
+        <NativeBaseProvider>
+          {visible ? false : <ActionSheetView />}
+        </NativeBaseProvider>
       </View>
     );
   }
@@ -215,5 +386,29 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: "#333",
     marginRight: 6,
+  },
+  priceD: {
+    fontSize: 15,
+    marginTop: 5,
+    fontWeight: "700",
+    color: "red",
+  },
+  row: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  space: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  buyNow: {
+    textAlign: "center",
+    color: "#fff",
+    marginTop: 10,
+  },
+  quantity: {
+    opacity: 0.6,
+    fontSize: 13,
+    marginVertical: 10,
   },
 });

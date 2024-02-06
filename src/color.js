@@ -4,5 +4,6 @@ class color {
   nav = "#E6C6F9";
   url = "http://192.168.202.55:8080/products/";
   cart = "http://192.168.202.55:8080/cart/";
+  favorite = "http://192.168.202.55:8080/favorite/";
 }
 module.exports = new color();

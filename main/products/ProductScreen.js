@@ -19,6 +19,8 @@ import axios from "axios";
 const url = color.url;
 import API from "../../api/ShoppingCart";
 import Storage from "../../api/Storage";
+import ApiFavorite from "../../api/Favorite";
+import { AntDesign } from "@expo/vector-icons";
 import {
   Actionsheet,
   useDisclose,
@@ -65,6 +67,23 @@ export default function ProductScreen({ route, navigation }) {
       setLoadList(false);
     }
   };
+
+  async function changeToFavorite() {
+    const idUser = await Storage.getData("@infoUser");
+    let result = await ApiFavorite.addToFavorite({
+      idUser: idUser,
+      id: data[0]._id,
+      name: data[0].productName,
+      img: data[0].imageUri,
+      price: data[0].info[0].price,
+      sold: data[0].sold,
+      rate: data[0].rating,
+    });
+    if (result == 1) {
+      Toast("Add product to favorite complete");
+      navigation.push("favorite");
+    } else Toast("Product exist");
+  }
   React.useEffect(() => {
     getItem();
   }, []);
@@ -234,12 +253,12 @@ export default function ProductScreen({ route, navigation }) {
             />
           </TouchableOpacity>
           <View style={styles.containerBar}>
-            <TouchableOpacity>
-              <MaterialIcons
+            <TouchableOpacity onPress={changeToFavorite}>
+              <AntDesign
+                name="hearto"
                 style={styles.icon}
-                color="#fff"
-                name="share"
                 size={25}
+                color="#fff"
               />
             </TouchableOpacity>
             <TouchableOpacity onPress={() => navigation.navigate("Cart")}>

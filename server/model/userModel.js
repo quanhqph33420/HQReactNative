@@ -12,6 +12,16 @@ const userSchema = new mongoose.Schema({
       size: Number,
     },
   ],
+  favorite: [
+    {
+      idProduct: String,
+      nameProduct: String,
+      imgProduct: String,
+      price: Number,
+      sold: Number,
+      rate: Number,
+    },
+  ],
   phone: String,
   password: String,
 });

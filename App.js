@@ -10,6 +10,7 @@ import ListProducts from "./main/products/ListProducts";
 import ProductScreen from "./main/products/ProductScreen";
 import ItemCart from "./welcome/ItemCart";
 import CartScreen from "./main/CartScreen";
+import FavoriteProduct from "./main/products/FavoriteProduct";
 
 const Stack = createNativeStackNavigator();
 
@@ -66,6 +67,11 @@ function App() {
           name="Cart"
           options={{ headerShown: false }}
           component={CartScreen}
+        />
+        <Stack.Screen
+          name="favorite"
+          options={{ headerShown: false }}
+          component={FavoriteProduct}
         />
       </Stack.Navigator>
     </NavigationContainer>
