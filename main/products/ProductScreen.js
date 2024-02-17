@@ -38,12 +38,16 @@ export default function ProductScreen({ route, navigation }) {
   const [refreshing, setRefreshing] = React.useState(false);
   const { isOpen, onOpen, onClose } = useDisclose();
   const [status, setStatus] = React.useState(false);
-  const [loadList, setLoadList] = React.useState(true);
+  const [heart, setHeart] = React.useState("");
 
   const onRefresh = React.useCallback(async () => {
     setRefreshing(true);
     await getItem();
   }, []);
+
+  function eArabic(x) {
+    return parseInt(x).toLocaleString("en-ES");
+  }
 
   function Toast(data) {
     ToastAndroid.showWithGravityAndOffset(
@@ -58,13 +62,18 @@ export default function ProductScreen({ route, navigation }) {
     try {
       const response = await axios.post(`${url}getItemProduct`, itemId);
       const json = response.data;
+      const idUser = await Storage.getData("@infoUser");
+      const checkItem = await ApiFavorite.checkInFavorite({
+        idProduct: json[0]._id,
+        idUser: idUser,
+      });
+      checkItem == 1 ? setHeart("heart") : setHeart("hearto");
       setData(json);
     } catch (error) {
       console.log(error);
     } finally {
       setLoading(false);
       setRefreshing(false);
-      setLoadList(false);
     }
   };
 
@@ -81,8 +90,17 @@ export default function ProductScreen({ route, navigation }) {
     });
     if (result == 1) {
       Toast("Add product to favorite complete");
-      navigation.push("favorite");
-    } else Toast("Product exist");
+      setHeart("heart");
+    } else {
+      let result = await ApiFavorite.removeFromFavorite({
+        idProduct: data[0]._id,
+        idUser: idUser,
+      });
+      if (result == 1) {
+        Toast("Remove from favorite complete");
+        setHeart("hearto");
+      }
+    }
   }
   React.useEffect(() => {
     getItem();
@@ -151,7 +169,7 @@ export default function ProductScreen({ route, navigation }) {
                 />
                 <View style={{ marginTop: 90 }}>
                   <Text style={{ color: "red", fontSize: 18 }}>
-                    ₫{info.price}
+                    ₫{eArabic(info.price)}
                   </Text>
                   <Text style={styles.quantity}>Quantity: {info.quantity}</Text>
                 </View>
@@ -255,7 +273,7 @@ export default function ProductScreen({ route, navigation }) {
           <View style={styles.containerBar}>
             <TouchableOpacity onPress={changeToFavorite}>
               <AntDesign
-                name="hearto"
+                name={heart}
                 style={styles.icon}
                 size={25}
                 color="#fff"

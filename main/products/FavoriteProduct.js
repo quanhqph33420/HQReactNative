@@ -8,10 +8,7 @@ import {
   RefreshControl,
   FlatList,
 } from "react-native";
-
-import { Input, Icon } from "native-base";
 import color from "../../src/color";
-import { MaterialIcons } from "@expo/vector-icons";
 import ItemFavorite from "../../welcome/ItemFavorite";
 import Storage from "../../api/Storage";
 import axios from "axios";
@@ -20,74 +17,29 @@ const url = color.favorite;
 export default function FavoriteProduct({ navigation }) {
   const [data, setData] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
-  const url = color.url;
+  const url = color.favorite;
 
   async function getProducts() {
     const idUser = await Storage.getData("@infoUser");
-    try {
-      const response = await axios.post(`${url}getProductFavorite`, {
-        id: idUser,
+    await axios
+      .get(`${url}getProductFavorite`, { params: { id: idUser } })
+      .then((result) => {
+        setData(result.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+      .finally(() => {
+        setLoading(false);
       });
-      const json = await response.data;
-      setData(json);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoading(false);
-    }
   }
 
   React.useEffect(() => {
-    getProducts();
-  }, []);
-
-  function NavigationBar() {
-    return (
-      <HStack px="3" padding="2" marginTop="10" alignItems="center">
-        <View style={{ flexDirection: "row", flex: 1, marginRight: 5 }}>
-          <View style={{ marginTop: 5, marginRight: 10 }}>
-            <TouchableOpacity
-              onPress={() => {
-                navigation.goBack();
-              }}
-              style={{
-                backgroundColor: "#878787",
-                borderRadius: 30,
-                opacity: 0.9,
-              }}
-            >
-              <MaterialIcons
-                name="arrow-back"
-                color="white"
-                size={35}
-                style={styles.icon}
-              />
-            </TouchableOpacity>
-          </View>
-
-          <Input
-            w={{
-              base: "80%",
-              md: "25%",
-            }}
-            variant="rounded"
-            size={6}
-            InputLeftElement={
-              <Icon as={<MaterialIcons name="search" />} size={6} ml="3" />
-            }
-            placeholder="Search"
-          />
-          <TouchableOpacity style={{ marginLeft: 5 }}>
-            <Avatar
-              bg="amber.500"
-              size={10}
-              source={require("../../src/main.jpg")}
-            />
-          </TouchableOpacity>
-        </View>
-      </HStack>
-    );
-  }
+    const unsubscribe = navigation.addListener("focus", () => {
+      getProducts();
+    });
+    return unsubscribe;
+  }, [navigation]);
 
   function ListContainer() {
     const [refreshing, setRefreshing] = React.useState(false);
@@ -110,7 +62,7 @@ export default function FavoriteProduct({ navigation }) {
             renderItem={({ item }) => (
               <TouchableOpacity
                 onPress={() =>
-                  navigation.push("ProductScreen", { itemId: item._id })
+                  navigation.push("ProductScreen", { itemId: item.idProduct })
                 }
               >
                 <ItemFavorite item={item} />
@@ -124,9 +76,6 @@ export default function FavoriteProduct({ navigation }) {
 
   return (
     <NativeBaseProvider>
-      <Center>
-        <NavigationBar />
-      </Center>
       <ListContainer />
     </NativeBaseProvider>
   );

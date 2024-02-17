@@ -9,18 +9,18 @@ export default function ItemFavorite({ item }) {
   return (
     <View style={{ width: width * 0.5, padding: 10 }}>
       <View style={styles.containerItem}>
-        <Image source={{ uri: item.imageUri }} style={styles.itemImage} />
+        <Image source={{ uri: item.imgProduct }} style={styles.itemImage} />
         <Text numberOfLines={1} ellipsizeMode="tail" style={styles.itemName}>
-          {item.productName}
+          {item.nameProduct}
         </Text>
         <View>
           <View
             style={{ justifyContent: "space-between", flexDirection: "row" }}
           >
-            <Text style={styles.itemPrice}>₫{eArabic(item.info[0].price)}</Text>
+            <Text style={styles.itemPrice}>₫{eArabic(item.price)}</Text>
             <Text style={styles.itemSold}>Sold {item.sold}</Text>
           </View>
-          <Text style={styles.itemSold}>Rate {item.rating}</Text>
+          <Text style={styles.itemSold}>Rate {item.rate}</Text>
         </View>
       </View>
     </View>

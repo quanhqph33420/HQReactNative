@@ -8,9 +8,10 @@ import ProfileScreen from "./main/profile/ProfileScreen";
 import Welcome from "./welcome/Welcome";
 import ListProducts from "./main/products/ListProducts";
 import ProductScreen from "./main/products/ProductScreen";
-import ItemCart from "./welcome/ItemCart";
 import CartScreen from "./main/CartScreen";
 import FavoriteProduct from "./main/products/FavoriteProduct";
+import AllchatScreen from "./chat/AllchatScreen";
+import ChatScreen from "./chat/ChatScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -31,7 +32,11 @@ function App() {
         <Stack.Screen
           name="SignUp"
           component={SignUpScreen}
-          options={{ headerShown: false }}
+          options={{
+            headerTitle: "",
+            headerShadowVisible: false,
+            headerStyle: { backgroundColor: "#f2f2f2" },
+          }}
         />
         <Stack.Screen
           name="Main"
@@ -40,12 +45,17 @@ function App() {
         />
         <Stack.Screen
           name="user"
-          options={{ headerShown: false }}
+          options={{
+            headerStyle: {
+              backgroundColor: "#f2f2f2",
+            },
+            headerShadowVisible: false,
+          }}
           component={UserScreen}
         />
         <Stack.Screen
           name="profile"
-          options={{ headerShown: false }}
+          options={{ headerTitle: "User" }}
           component={ProfileScreen}
         />
         <Stack.Screen
@@ -59,20 +69,23 @@ function App() {
           component={ProductScreen}
         />
         <Stack.Screen
-          name="ItemCart"
-          options={{ headerShown: false }}
-          component={ItemCart}
-        />
-        <Stack.Screen
           name="Cart"
           options={{ headerShown: false }}
           component={CartScreen}
         />
         <Stack.Screen
           name="favorite"
-          options={{ headerShown: false }}
+          options={{ headerTitle: "Favorite" }}
           component={FavoriteProduct}
         />
+        <Stack.Screen
+          name="allChat"
+          options={{
+            headerTitle: "My message",
+          }}
+          component={AllchatScreen}
+        />
+        <Stack.Screen name="chat" component={ChatScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

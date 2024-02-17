@@ -44,15 +44,10 @@ export default function ListProducts({ navigation }) {
               onPress={() => {
                 navigation.goBack();
               }}
-              style={{
-                backgroundColor: "#878787",
-                borderRadius: 30,
-                opacity: 0.9,
-              }}
             >
               <MaterialIcons
                 name="arrow-back"
-                color="white"
+                color="black"
                 size={35}
                 style={styles.icon}
               />

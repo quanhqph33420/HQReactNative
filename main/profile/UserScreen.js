@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   HStack,
   Avatar,
@@ -9,21 +9,20 @@ import {
   Button,
 } from "native-base";
 import { ScrollView, Text, TouchableOpacity, StyleSheet } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons";
+import { MaterialIcons, AntDesign } from "@expo/vector-icons";
 export default function UserScreen({ navigation }) {
   const [isOpen, setIsOpen] = React.useState(false);
-
   const onClose = () => setIsOpen(false);
-
-  function NavigationBar() {
-    return (
-      <HStack px="3" padding="2" marginTop="10">
-        <Text style={{ fontSize: 30, fontWeight: "bold", flex: 1 }}>
-          Profile
-        </Text>
-      </HStack>
-    );
-  }
+  useEffect(() => {
+    navigation.setOptions({
+      title: "Profile",
+      headerRight: () => (
+        <TouchableOpacity onPress={() => navigation.navigate("allChat")}>
+          <MaterialIcons color="#877E7E" name="message" size={25} />
+        </TouchableOpacity>
+      ),
+    });
+  }, []);
   const ShowDialog = () => {
     const cancelRef = React.useRef(null);
     return (
@@ -67,7 +66,7 @@ export default function UserScreen({ navigation }) {
   };
   function Body() {
     return (
-      <ScrollView>
+      <ScrollView style={{ marginTop: 20 }}>
         <TouchableOpacity onPress={() => navigation.navigate("profile")}>
           <View style={styles.bodyContainer}>
             <Avatar
@@ -83,6 +82,7 @@ export default function UserScreen({ navigation }) {
             </View>
           </View>
         </TouchableOpacity>
+
         <View style={styles.line} />
         {/* history */}
         <View style={styles.menu}>
@@ -117,26 +117,15 @@ export default function UserScreen({ navigation }) {
           </TouchableOpacity>
         </View>
         <View style={styles.line} />
-        {/* About */}
-        <View style={styles.menu}>
-          <TouchableOpacity style={styles.item}>
-            <View style={styles.item}>
-              <MaterialIcons name="question-answer" size={30} />
-              <Text style={styles.textItem}>About</Text>
-            </View>
-            <MaterialIcons name="arrow-right" size={35} />
-          </TouchableOpacity>
-        </View>
-        <View style={styles.line} />
-        {/* main */}
+        {/* Favorite */}
         <View style={styles.menu}>
           <TouchableOpacity
             style={styles.item}
-            onPress={() => navigation.navigate("Main")}
+            onPress={() => navigation.navigate("favorite")}
           >
             <View style={styles.item}>
-              <MaterialIcons name="home" size={30} />
-              <Text style={styles.textItem}>Home</Text>
+              <AntDesign name="hearto" size={30} />
+              <Text style={styles.textItem}>Favorite</Text>
             </View>
             <MaterialIcons name="arrow-right" size={35} />
           </TouchableOpacity>
@@ -173,9 +162,6 @@ export default function UserScreen({ navigation }) {
   }
   return (
     <NativeBaseProvider>
-      <Center>
-        <NavigationBar />
-      </Center>
       <Body />
       <ShowDialog />
     </NativeBaseProvider>

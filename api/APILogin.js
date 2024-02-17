@@ -1,5 +1,6 @@
 import axios from "axios";
-const url = "http://192.168.202.55:8080/login/";
+import uri from "../src/color";
+const url = uri.login;
 class API {
   async signIn(data) {
     if (data) {

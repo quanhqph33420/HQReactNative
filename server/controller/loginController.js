@@ -16,6 +16,7 @@ class loginController {
     const email = req.body.email;
     const fullname = req.body.fullname;
     const phone = req.body.phone;
+
     await userModel
       .find({ username: username })
       .then(async (result) => {
@@ -29,6 +30,7 @@ class loginController {
               fullname: fullname,
               phone: phone,
               password: password,
+              avatar: "https://www.bing.com/images/blob?bcid=r4s6tE00kK0GNg",
             })
             .then((result) => res.json(result.length))
             .catch((err) => console.log(err));

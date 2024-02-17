@@ -164,7 +164,9 @@ export default function CartScreen({ navigation }) {
         } else Toast("Product exist!");
       } else Toast("You don't selected product!");
     }
-
+    function eArabic(x) {
+      return parseInt(x).toLocaleString("en-ES");
+    }
     return (
       <Center>
         <Actionsheet isOpen={isOpen} onClose={onClose}>
@@ -180,7 +182,7 @@ export default function CartScreen({ navigation }) {
                 />
                 <View style={{ marginTop: 90 }}>
                   <Text style={{ color: "red", fontSize: 18 }}>
-                    ₫{info.price}
+                    ₫{eArabic(info.price)}
                   </Text>
                   <Text style={styles.quantity}>Quantity: {info.quantity}</Text>
                 </View>

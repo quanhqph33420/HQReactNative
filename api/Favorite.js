@@ -10,5 +10,21 @@ class Favorite {
         console.log(err);
       });
   }
+  async removeFromFavorite(data) {
+    return await axios
+      .post(`${url}removeFromFavorite`, data)
+      .then((result) => result.data)
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+  async checkInFavorite(data) {
+    return await axios
+      .post(`${url}checkInFavorite`, data)
+      .then((result) => result.data)
+      .catch((err) => {
+        console.log(err);
+      });
+  }
 }
 module.exports = new Favorite();
