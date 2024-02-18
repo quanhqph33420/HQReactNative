@@ -14,3 +14,4 @@
  react-native-super-grid
  react-native-hook-image-slider
  @react-native-async-storage/async-storage
+ react-native-gifted-chat

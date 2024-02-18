@@ -8,6 +8,6 @@ class color {
   favorite = "http://192.168.1.6:8080/favorite/";
   login = "http://192.168.1.6:8080/login/";
   chat = "http://192.168.1.6:8080/chat/";
-  json_server = "http://192.168.1.6:3000/";
+  ipconfig = "http://192.168.1.6:8080";
 }
 module.exports = new color();

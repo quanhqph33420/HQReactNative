@@ -79,5 +79,37 @@ class chatController {
         console.log(err);
       });
   }
+  async sendMessage(req, res) {
+    const { id, messages } = req.body;
+    await textChatModel
+      .findByIdAndUpdate(
+        id,
+        {
+          $push: {
+            message: messages,
+          },
+        },
+        { new: true }
+      )
+      .then((result) => {
+        res.json(result.message[result.message.length - 1]);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+  async getMessage(req, res) {
+    const { id } = req.query;
+    await textChatModel
+      .find({ _id: id })
+      .then((result) => {
+        result[0].message == ""
+          ? res.send("0")
+          : res.send(result[0].message.reverse());
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
 }
 module.exports = new chatController();

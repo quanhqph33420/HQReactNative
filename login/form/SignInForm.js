@@ -78,7 +78,7 @@ export default function SignInForm({ navigation }) {
     } else {
       const result = await API.signIn(user);
       if (result != "") {
-        await Storage.storeData("@infoUser", result);
+        await Storage.setData("@infoUser", result);
         //day len sever de lay chuoi ma hoa jwt
         navigation.navigate("Main");
       } else {
