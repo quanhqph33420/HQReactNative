@@ -1,5 +1,7 @@
 import { Text, View, Image, TouchableOpacity } from "react-native";
 import color from "../src/color";
+import Storage from "../api/Storage";
+import axios from "axios";
 
 export default function Welcome({ navigation }) {
   return (
@@ -23,7 +25,35 @@ export default function Welcome({ navigation }) {
         style !
       </Text>
 
-      <TouchableOpacity onPress={() => navigation.navigate("SignIn")}>
+      <TouchableOpacity
+        onPress={async () => {
+          const token = await Storage.getData("@keyUser");
+          token
+            ? await axios
+                .post(`${color.login}decryptionLogin`, {
+                  headers: {
+                    "Content-Type": "application/json",
+                    Authorization: token,
+                  },
+                })
+                .then(async (result) => {
+                  await axios
+                    .post(`${color.login}signIn`, result.data)
+                    .then((result) => {
+                      result != ""
+                        ? navigation.navigate("Main")
+                        : navigation.navigate("SignIn");
+                    })
+                    .catch((err) => {
+                      console.log(err);
+                    });
+                })
+                .catch((err) => {
+                  console.log(err);
+                })
+            : navigation.navigate("SignIn");
+        }}
+      >
         <View
           style={{
             backgroundColor: color.DarkViolet,

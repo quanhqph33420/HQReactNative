@@ -8,6 +8,10 @@
  mongoose
  dotenv
  axios
+ nodemon
+ http
+ jsonwebtoken
+ react-native-swiper
  react-native-toast
  react-native-paper
  react-native-elements
@@ -15,3 +19,5 @@
  react-native-hook-image-slider
  @react-native-async-storage/async-storage
  react-native-gifted-chat
+ socket.io
+ socket.io-client

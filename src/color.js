@@ -1,13 +1,14 @@
+const ip = "http://192.168.41.55:8080";
 class color {
   Teal = "#008080";
   DarkViolet = "#9400D3";
   nav = "#E6C6F9";
   bar = "#f2f2f2";
-  url = "http://192.168.1.6:8080/products/";
-  cart = "http://192.168.1.6:8080/cart/";
-  favorite = "http://192.168.1.6:8080/favorite/";
-  login = "http://192.168.1.6:8080/login/";
-  chat = "http://192.168.1.6:8080/chat/";
-  ipconfig = "http://192.168.1.6:8080";
+  url = `${ip}/products/`;
+  cart = `${ip}/cart/`;
+  favorite = `${ip}/favorite/`;
+  login = `${ip}/login/`;
+  chat = `${ip}/chat/`;
+  ipconfig = `${ip}`;
 }
 module.exports = new color();

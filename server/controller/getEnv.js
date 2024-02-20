@@ -12,5 +12,8 @@ class getEnv {
   getCollectionUser() {
     return process.env.COLLECTION_USER;
   }
+  getKeyJwt() {
+    return process.env.KEY_JWT;
+  }
 }
 module.exports = new getEnv();

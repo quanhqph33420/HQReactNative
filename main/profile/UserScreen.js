@@ -10,6 +10,7 @@ import {
 } from "native-base";
 import { ScrollView, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { MaterialIcons, AntDesign } from "@expo/vector-icons";
+import Storage from "../../api/Storage";
 export default function UserScreen({ navigation }) {
   const [isOpen, setIsOpen] = React.useState(false);
   const onClose = () => setIsOpen(false);
@@ -50,8 +51,10 @@ export default function UserScreen({ navigation }) {
                 </Button>
                 <Button
                   colorScheme="danger"
-                  onPress={function () {
+                  onPress={async function () {
                     setIsOpen(false);
+                    await Storage.setData("@keyUser", "");
+                    console.log("Removed key");
                     navigation.navigate("SignIn");
                   }}
                 >

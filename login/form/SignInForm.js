@@ -9,13 +9,15 @@ import {
   View,
   Box,
   Button,
+  Checkbox,
 } from "native-base";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Text, StyleSheet, TouchableOpacity, ToastAndroid } from "react-native";
 import color from "../../src/color";
-import User from "../../model/userModel";
+import User, { password } from "../../model/userModel";
 import API from "../../api/APILogin";
 import Storage from "../../api/Storage";
+import axios from "axios";
 
 export default function SignInForm({ navigation }) {
   const user = new User.user();
@@ -33,6 +35,7 @@ export default function SignInForm({ navigation }) {
   }
   function InputForm() {
     const [show, setShow] = React.useState(false);
+
     return (
       <Stack space={4} w="100%" alignItems="center">
         <Input
@@ -78,9 +81,20 @@ export default function SignInForm({ navigation }) {
     } else {
       const result = await API.signIn(user);
       if (result != "") {
-        await Storage.setData("@infoUser", result);
-        //day len sever de lay chuoi ma hoa jwt
-        navigation.navigate("Main");
+        await Storage.setData("@infoUser", result.id);
+        await axios
+          .post(`${color.login}encryptionLogin`, {
+            username: result.username,
+            password: result.password,
+          })
+          .then(async (result) => {
+            await Storage.setData("@keyUser", result.data);
+            console.log("Saved key");
+            navigation.navigate("Main");
+          })
+          .catch((err) => {
+            console.log(err);
+          });
       } else {
         Toast("Username or Password incorrect!");
       }

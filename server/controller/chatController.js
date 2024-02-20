@@ -111,5 +111,23 @@ class chatController {
         console.log(err);
       });
   }
+  async lastMessage(req, res) {
+    const { id, text, date } = req.body;
+    await chatModel
+      .findByIdAndUpdate(id, {
+        $set: {
+          lastChat: {
+            text: text,
+            date: date,
+          },
+        },
+      })
+      .then((result) => {
+        res.json(true);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
 }
 module.exports = new chatController();

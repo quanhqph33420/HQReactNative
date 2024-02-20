@@ -120,7 +120,7 @@ export default function ChatScreen({ navigation, route }) {
         id: idMessage,
         messages: messages,
       })
-      .then((result) => {
+      .then(async (result) => {
         socket.emit("sendMessage", result.data[0]);
       })
       .catch((err) => {
