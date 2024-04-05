@@ -1,13 +1,15 @@
-const userModel = require("../model/userModel");
+const favoriteModel = require("../model/favorite");
 class favorite {
   async addToFavorite(req, res) {
     const { idUser, id, name, img, price, sold, rate } = req.body;
-    await userModel
+    await favoriteModel
       .find({ "favorite.idProduct": id })
       .then(async (result) => {
-        result.length != 1
-          ? await userModel
-              .findByIdAndUpdate(idUser, {
+        if (result.length != 1) {
+          await favoriteModel
+            .findOneAndUpdate(
+              { idUser: idUser },
+              {
                 $push: {
                   favorite: [
                     {
@@ -21,14 +23,18 @@ class favorite {
                     },
                   ],
                 },
-              })
-              .then((result) => {
-                res.json(1);
-              })
-              .catch((err) => {
-                console.log(err);
-              })
-          : res.json("0");
+              },
+              { upsert: true }
+            )
+            .then((result) => {
+              res.json(1);
+            })
+            .catch((err) => {
+              console.log(err);
+            });
+        } else {
+          res.json("0");
+        }
       })
       .catch((err) => {
         console.log(err);
@@ -36,8 +42,8 @@ class favorite {
   }
   async getProductFavorite(req, res) {
     const { id } = req.query;
-    await userModel
-      .find({ _id: id })
+    await favoriteModel
+      .find({ idUser: id })
       .then((result) => {
         const favorite = result.map((val) => val.favorite);
         res.send(favorite[0]);
@@ -46,14 +52,17 @@ class favorite {
         console.log(err);
       });
   }
+
   async removeFromFavorite(req, res) {
     const { idProduct, idUser } = req.body;
     try {
-      const responsive = await userModel.updateMany(
-        { _id: idUser },
+      const responsive = await favoriteModel.updateMany(
+        { idUser: idUser },
         {
           $pull: {
-            favorite: { idProduct: idProduct },
+            favorite: {
+              idProduct: idProduct,
+            },
           },
         }
       );
@@ -62,11 +71,12 @@ class favorite {
       console.log(error);
     }
   }
+
   async checkInFavorite(req, res) {
     const { idProduct, idUser } = req.body;
-    await userModel
+    await favoriteModel
       .find({
-        _id: idUser,
+        idUser: idUser,
         "favorite.idProduct": idProduct,
       })
       .then((result) => {
