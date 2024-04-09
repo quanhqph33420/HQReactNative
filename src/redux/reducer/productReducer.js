@@ -10,7 +10,17 @@ export const getProducts = createAsyncThunk("product/getProduct", async () => {
     console.log(error);
   }
 });
-
+export const getItemProduct = createAsyncThunk(
+  "product/getItemProduct",
+  async (val) => {
+    try {
+      let { data } = await axios.post(`${ipProduct}/getItemProduct`, val);
+      return data;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+);
 const slice = createSlice({
   name: "listProduct",
   initialState: {
@@ -18,6 +28,8 @@ const slice = createSlice({
     dataSearch: [],
     loading: true,
     err: null,
+    item: {},
+    loadingItem: true,
   },
   reducers: {
     searchProduct: (state, action) => {

@@ -10,41 +10,26 @@ import {
 } from "react-native";
 
 import ItemFavorite from "../../components/ItemFavorite";
-import Storage from "../../../key/Storage";
-import { ipFavorite } from "@env";
-import axios from "axios";
+import { useSelector, useDispatch } from "react-redux";
+import { getProductFavorite } from "../../../src/redux/reducer/favoriteReducer";
 
 export default function FavoriteProduct({ navigation }) {
-  const [data, setData] = React.useState([]);
-  const [loading, setLoading] = React.useState(true);
-
-  async function getProducts() {
-    const idUser = await Storage.getData("@infoUser");
-    await axios
-      .get(`${ipFavorite}/getProductFavorite`, { params: { id: idUser } })
-      .then((result) => {
-        setData(result.data);
-      })
-      .catch((err) => {
-        console.log(err);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }
+  const data = useSelector((s) => s.favorite.data);
+  const loading = useSelector((s) => s.favorite.loading);
+  const dispatch = useDispatch();
 
   React.useEffect(() => {
     const unsubscribe = navigation.addListener("focus", () => {
-      getProducts();
+      dispatch(getProductFavorite());
     });
     return unsubscribe;
   }, [navigation]);
 
   function ListContainer() {
     const [refreshing, setRefreshing] = React.useState(false);
-    const onRefresh = React.useCallback(async () => {
+    const onRefresh = React.useCallback(() => {
       setRefreshing(true);
-      await getProducts();
+      dispatch(getProductFavorite());
     }, []);
 
     return (

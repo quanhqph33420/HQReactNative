@@ -10,7 +10,8 @@ const express = require("express"),
   http = require("http"),
   socketIo = require("socket.io"),
   passwordRouter = require("./router/password"),
-  recentRouter = require("./router/recent");
+  recentRouter = require("./router/recent"),
+  commentRouter = require("./router/comment");
 
 const app = express();
 app.use(express.json());
@@ -32,7 +33,7 @@ mongoose
     console.log(err);
   });
 
-app.get("/", (req, res) => res.send(""));
+app.get("/", (req, res) => res.send("<h1>Hello</h1>"));
 app.use("/login", routerLogin);
 app.use("/products", routerProduct);
 app.use("/cart", routerCart);
@@ -40,6 +41,7 @@ app.use("/favorite", routerFavorite);
 app.use("/chat", chatRouter);
 app.use("/password", passwordRouter);
 app.use("/recent", recentRouter);
+app.use("/comment", commentRouter);
 
 io.on("connection", (socket) => {
   console.log(`User ${socket.id} connected`);

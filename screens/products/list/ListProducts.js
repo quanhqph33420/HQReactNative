@@ -11,10 +11,9 @@ import { TouchableOpacity, StyleSheet, View, FlatList } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import ItemProduct from "../../components/ItemProduct";
 import { useDispatch, useSelector } from "react-redux";
-import { searchProduct } from "../../../src/redux/reducer/searchReducer";
+import { searchProduct } from "../../../src/redux/reducer/productReducer";
 
 export default function ListProducts({ navigation }) {
-  const data = useSelector((s) => s.product.data);
   const dispatch = useDispatch();
 
   function findProduct(text) {
@@ -69,7 +68,6 @@ export default function ListProducts({ navigation }) {
     const dataSearch = useSelector((s) => s.product.dataSearch);
     return (
       <View style={{ flex: 1 }}>
-        {console.log("render list")}
         <FlatList
           data={dataSearch}
           numColumns={2}

@@ -9,38 +9,36 @@ import {
   RefreshControl,
   ScrollView,
   FlatList,
+  Alert,
 } from "react-native";
 import SliderShow from "./components/SliderShow";
 import ItemProduct from "./components/ItemProduct";
 import ItemFavorite from "./components/ItemFavorite";
 import { MaterialIcons } from "@expo/vector-icons";
 import Storage from "../key/Storage";
-import { ipRecent } from "@env";
-import api from "./api";
-import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
-import { getProducts } from "../src/redux/reducer/searchReducer";
+import { getProducts } from "../src/redux/reducer/productReducer";
+import {
+  addRecent,
+  getRecent,
+  removeRecent,
+} from "../src/redux/reducer/recentReducer";
 
 export default function HomeScreen({ navigation }) {
   const data = useSelector((s) => s.product.data);
   const loading = useSelector((s) => s.product.loading);
-  const [recent, setRecent] = React.useState([]);
+  const loadingRecent = useSelector((s) => s.recent.loading);
+  const dataRecent = useSelector((s) => s.recent.data);
   const dispatch = useDispatch();
 
-  async function getRecent() {
-    try {
-      const id = await Storage.getData("@infoUser");
-      let { data } = await axios.get(`${ipRecent}/getRecent?id=${id}`);
-      setRecent(data);
-    } catch (error) {
-      console.log("getRecent: " + error);
-    }
-  }
-
   React.useEffect(() => {
-    dispatch(getProducts());
-  }, []);
-
+    const unsubscribe = navigation.addListener("focus", () => {
+      dispatch(getProducts());
+      dispatch(getRecent());
+    });
+    return unsubscribe;
+  }, [navigation]);
+  
   function NavigationBar() {
     return (
       <HStack
@@ -105,6 +103,7 @@ export default function HomeScreen({ navigation }) {
     const onRefresh = React.useCallback(async () => {
       setRefreshing(true);
       dispatch(getProducts());
+      dispatch(getRecent());
     }, []);
 
     const shirt = data.filter((e) => e.productType == "shirt");
@@ -131,15 +130,17 @@ export default function HomeScreen({ navigation }) {
                 <TouchableOpacity
                   onPress={async () => {
                     const idUser = await Storage.getData("@infoUser");
-                    let result = await api.addRecent({
-                      idUser: idUser,
-                      id: item._id,
-                      name: item.productName,
-                      img: item.imageUri,
-                      price: item.info[0].price,
-                      sold: item.sold,
-                      rate: item.rating,
-                    });
+                    dispatch(
+                      addRecent({
+                        idUser: idUser,
+                        id: item._id,
+                        name: item.productName,
+                        img: item.imageUri,
+                        price: item.info[0].price,
+                        sold: item.sold,
+                        rate: item.rating,
+                      })
+                    );
 
                     navigation.push("ProductScreen", { itemId: item._id });
                   }}
@@ -157,16 +158,17 @@ export default function HomeScreen({ navigation }) {
                 <TouchableOpacity
                   onPress={async () => {
                     const idUser = await Storage.getData("@infoUser");
-                    let result = await api.addRecent({
-                      idUser: idUser,
-                      id: item._id,
-                      name: item.productName,
-                      img: item.imageUri,
-                      price: item.info[0].price,
-                      sold: item.sold,
-                      rate: item.rating,
-                    });
-
+                    dispatch(
+                      addRecent({
+                        idUser: idUser,
+                        id: item._id,
+                        name: item.productName,
+                        img: item.imageUri,
+                        price: item.info[0].price,
+                        sold: item.sold,
+                        rate: item.rating,
+                      })
+                    );
                     navigation.push("ProductScreen", { itemId: item._id });
                   }}
                 >
@@ -183,16 +185,17 @@ export default function HomeScreen({ navigation }) {
                 <TouchableOpacity
                   onPress={async () => {
                     const idUser = await Storage.getData("@infoUser");
-                    let result = await api.addRecent({
-                      idUser: idUser,
-                      id: item._id,
-                      name: item.productName,
-                      img: item.imageUri,
-                      price: item.info[0].price,
-                      sold: item.sold,
-                      rate: item.rating,
-                    });
-
+                    dispatch(
+                      addRecent({
+                        idUser: idUser,
+                        id: item._id,
+                        name: item.productName,
+                        img: item.imageUri,
+                        price: item.info[0].price,
+                        sold: item.sold,
+                        rate: item.rating,
+                      })
+                    );
                     navigation.push("ProductScreen", { itemId: item._id });
                   }}
                 >
@@ -204,32 +207,48 @@ export default function HomeScreen({ navigation }) {
               <Text style={styles.textHeader}>Recent</Text>
               <TouchableOpacity
                 style={{ marginTop: 12 }}
-                onPress={async () => {
-                  let idUser = await Storage.getData("@infoUser");
-                  let result = await api.removeRecent(idUser);
-                  if (result) {
-                    await getProducts();
-                  }
-                }}
+                onPress={async () =>
+                  Alert.alert(
+                    "Clear recently",
+                    "You sure want clear recent ?",
+                    [
+                      {
+                        text: "Cancel",
+                        style: "cancel",
+                      },
+                      {
+                        text: "Confirm",
+                        onPress: async () => {
+                          let idUser = await Storage.getData("@infoUser");
+                          dispatch(removeRecent(idUser));
+                        },
+                      },
+                    ]
+                  )
+                }
               >
                 <Text>Clear recent</Text>
               </TouchableOpacity>
             </View>
-            <FlatList
-              data={recent}
-              horizontal
-              renderItem={({ item }) => (
-                <TouchableOpacity
-                  onPress={() => {
-                    navigation.push("ProductScreen", {
-                      itemId: item.idProduct,
-                    });
-                  }}
-                >
-                  <ItemFavorite item={item} />
-                </TouchableOpacity>
-              )}
-            />
+            {loadingRecent ? (
+              <ActivityIndicator />
+            ) : (
+              <FlatList
+                data={dataRecent}
+                horizontal
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    onPress={() => {
+                      navigation.push("ProductScreen", {
+                        itemId: item.idProduct,
+                      });
+                    }}
+                  >
+                    <ItemFavorite item={item} />
+                  </TouchableOpacity>
+                )}
+              />
+            )}
           </ScrollView>
         )}
       </View>

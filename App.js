@@ -73,7 +73,13 @@ export default function App() {
           />
           <Stack.Screen
             name="ProductScreen"
-            options={{ headerShown: false }}
+            options={{
+              headerBackVisible: false,
+              headerStyle: {
+                backgroundColor: "#f2f2f2",
+              },
+              headerShadowVisible: false,
+            }}
             component={ProductScreen}
           />
           <Stack.Screen

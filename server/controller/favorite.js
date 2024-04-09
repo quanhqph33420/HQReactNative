@@ -3,7 +3,7 @@ class favorite {
   async addToFavorite(req, res) {
     const { idUser, id, name, img, price, sold, rate } = req.body;
     await favoriteModel
-      .find({ "favorite.idProduct": id })
+      .find({ "favorite.idProduct": id, idUser: idUser })
       .then(async (result) => {
         if (result.length != 1) {
           await favoriteModel
@@ -24,16 +24,16 @@ class favorite {
                   ],
                 },
               },
-              { upsert: true }
+              { upsert: true, new: true }
             )
             .then((result) => {
-              res.json(1);
+              res.json(result.favorite[result.favorite.length - 1]);
             })
             .catch((err) => {
               console.log(err);
             });
         } else {
-          res.json("0");
+          res.json(false);
         }
       })
       .catch((err) => {

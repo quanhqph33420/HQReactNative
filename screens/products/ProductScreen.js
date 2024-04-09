@@ -3,7 +3,6 @@ import {
   View,
   Text,
   StyleSheet,
-  ImageBackground,
   ScrollView,
   ActivityIndicator,
   Image,
@@ -13,13 +12,12 @@ import {
 } from "react-native";
 
 import { MaterialIcons } from "@expo/vector-icons";
-import React from "react";
+import React, { useEffect, useState, useCallback } from "react";
 const { width } = Dimensions.get("window");
 import { ipProduct } from "@env";
 import axios from "axios";
 import apiCart from "./cart/api";
 import Storage from "../../key/Storage";
-import apiFavorite from "./favorite/api";
 import { AntDesign } from "@expo/vector-icons";
 import {
   Actionsheet,
@@ -30,19 +28,29 @@ import {
   Button,
   Divider,
 } from "native-base";
+import { useSelector, useDispatch } from "react-redux";
+import ListComment from "./ListComment";
+import {
+  addProductToFavorite,
+  checkInFavorite,
+  removeFromFavorite,
+} from "../../src/redux/reducer/favoriteReducer";
+import { getComment } from "../../src/redux/reducer/commentReducer";
 
 export default function ProductScreen({ route, navigation }) {
   const itemId = route.params;
-  const [data, setData] = React.useState([]);
-  const [loading, setLoading] = React.useState(true);
-  const [refreshing, setRefreshing] = React.useState(false);
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclose();
-  const [status, setStatus] = React.useState(false);
-  const [heart, setHeart] = React.useState("");
+  const [status, setStatus] = useState(false);
+  const heart_ = useSelector((s) => s.favorite.heart);
+  const dispatch = useDispatch();
 
-  const onRefresh = React.useCallback(async () => {
+  const onRefresh = useCallback(async () => {
     setRefreshing(true);
     await getItem();
+    dispatch(getComment({ itemId: itemId.itemId }));
   }, []);
 
   function eArabic(x) {
@@ -63,11 +71,12 @@ export default function ProductScreen({ route, navigation }) {
       const response = await axios.post(`${ipProduct}/getItemProduct`, itemId);
       const json = response.data;
       const idUser = await Storage.getData("@infoUser");
-      const checkItem = await apiFavorite.checkInFavorite({
-        idProduct: json[0]._id,
-        idUser: idUser,
-      });
-      checkItem == 1 ? setHeart("heart") : setHeart("hearto");
+      dispatch(
+        checkInFavorite({
+          idProduct: json[0]._id,
+          idUser: idUser,
+        })
+      );
       setData(json);
     } catch (error) {
       console.log(error);
@@ -79,32 +88,34 @@ export default function ProductScreen({ route, navigation }) {
 
   async function changeToFavorite() {
     const idUser = await Storage.getData("@infoUser");
-    let result = await apiFavorite.addToFavorite({
-      idUser: idUser,
-      id: data[0]._id,
-      name: data[0].productName,
-      img: data[0].imageUri,
-      price: data[0].info[0].price,
-      sold: data[0].sold,
-      rate: data[0].rating,
-    });
-    if (result == 1) {
-      Toast("Add product to favorite complete");
-      setHeart("heart");
-    } else {
-      let result = await apiFavorite.removeFromFavorite({
-        idProduct: data[0]._id,
-        idUser: idUser,
-      });
-      if (result == 1) {
-        Toast("Remove from favorite complete");
-        setHeart("hearto");
-      }
-    }
+    heart_ == "hearto"
+      ? dispatch(
+          addProductToFavorite({
+            idUser: idUser,
+            id: data[0]._id,
+            name: data[0].productName,
+            img: data[0].imageUri,
+            price: data[0].info[0].price,
+            sold: data[0].sold,
+            rate: data[0].rating,
+          })
+        )
+      : dispatch(
+          removeFromFavorite({
+            idProduct: data[0]._id,
+            idUser: idUser,
+          })
+        );
   }
 
-  React.useEffect(() => {
+  useEffect(() => {
     getItem();
+  }, []);
+
+  useEffect(() => {
+    navigation.setOptions({
+      headerRight: () => <NavigationBar />,
+    });
   }, []);
 
   function ActionSheetView() {
@@ -258,14 +269,12 @@ export default function ProductScreen({ route, navigation }) {
 
   function NavigationBar() {
     return (
-      <ImageBackground
-        style={{ height: 400 }}
-        source={{ uri: data[0].imageUri }}
-        stretch
-        resizeMode="cover"
-      >
+      <View style={[styles.containerNavigation]}>
         <View style={[styles.containerBar, styles.container]}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
+          <TouchableOpacity
+            style={{ marginLeft: 5 }}
+            onPress={() => navigation.goBack()}
+          >
             <MaterialIcons
               name="arrow-back"
               color="#fff"
@@ -273,16 +282,11 @@ export default function ProductScreen({ route, navigation }) {
               style={styles.icon}
             />
           </TouchableOpacity>
-          <View style={styles.containerBar}>
-            <TouchableOpacity onPress={changeToFavorite}>
-              <AntDesign
-                name={heart}
-                style={styles.icon}
-                size={25}
-                color="#fff"
-              />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => navigation.navigate("Cart")}>
+          <View style={[styles.containerBar]}>
+            <TouchableOpacity
+              style={{ marginRight: 5 }}
+              onPress={() => navigation.navigate("Cart")}
+            >
               <MaterialIcons
                 style={styles.icon}
                 color="#fff"
@@ -290,7 +294,7 @@ export default function ProductScreen({ route, navigation }) {
                 size={25}
               />
             </TouchableOpacity>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate("allChat")}>
               <MaterialIcons
                 style={styles.icon}
                 color="#fff"
@@ -300,12 +304,14 @@ export default function ProductScreen({ route, navigation }) {
             </TouchableOpacity>
           </View>
         </View>
-      </ImageBackground>
+      </View>
     );
   }
+
   function eArabic(x) {
     return parseInt(x).toLocaleString("en-ES");
   }
+
   function Body() {
     return (
       <View>
@@ -394,24 +400,41 @@ export default function ProductScreen({ route, navigation }) {
       </View>
     );
   }
-
+  function IamgeView() {
+    return (
+      <View style={{ position: "relative" }}>
+        <Image
+          height={400}
+          source={{ uri: data[0].imageUri }}
+          resizeMode="cover"
+        />
+        <TouchableOpacity
+          style={{ position: "absolute", bottom: 10, right: 10 }}
+          onPress={changeToFavorite}
+        >
+          <AntDesign name={heart_} style={styles.icon} size={25} color="#fff" />
+        </TouchableOpacity>
+      </View>
+    );
+  }
   return (
     <NativeBaseProvider>
       {loading ? (
         <ActivityIndicator />
       ) : (
-        <ScrollView>
-          <NavigationBar />
-          <ScrollView
-            refreshControl={
-              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-            }
-          >
+        <ScrollView
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+        >
+          <IamgeView />
+          <ScrollView>
             <View>
               <Body />
               <ActionSheetView />
             </View>
           </ScrollView>
+          <ListComment itemId={itemId} />
         </ScrollView>
       )}
       {!loading ? <ButtonForm /> : false}
@@ -428,12 +451,12 @@ const styles = StyleSheet.create({
   containerBar: {
     flexDirection: "row",
     marginHorizontal: 5,
-    marginVertical: 15,
     alignItems: "center",
-    height: 100,
   },
   container: {
     justifyContent: "space-between",
+    position: "absolute",
+    width: "100%",
   },
   icon: {
     backgroundColor: "#877E7E",
@@ -509,5 +532,10 @@ const styles = StyleSheet.create({
     opacity: 0.6,
     fontSize: 13,
     marginVertical: 10,
+  },
+  containerNavigation: {
+    width: "98%",
+    marginBottom: "8%",
+    position: "relative",
   },
 });
